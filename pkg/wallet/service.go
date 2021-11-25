@@ -141,9 +141,15 @@ func (s *Service) Repeat(paymentID string) (*types.Payment, error) {
 	if err != nil {
 		return nil, err
 	}
+	account, err := s.FindAccountByID(payment.AccountID)
+	if err != nil {
+		return nil, err
+	}
 
-	newPayment := payment
-	s.payments = append(s.payments, newPayment)
-
-	return newPayment, nil
+	pay, err := s.Pay(account.ID, payment.Amount, payment.Category)
+	pay.ID = paymentID
+	if err != nil {
+	 return nil, err
+	}
+	return pay, nil
 }
