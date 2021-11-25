@@ -189,3 +189,22 @@ func (s *testService) addAccount(data testAccount) (*types.Account, []*types.Pay
 
 	return account, payments, nil
 }
+
+// Повторяет платёж по идентификатору
+func (s *Service) Repeat(paymentID string) (*types.Payment, error) {
+	payment, err := s.FindPaymentByID(paymentID)
+	if err != nil {
+		return nil, err
+	}
+
+	// newPaymentID := uuid.New().String()
+	// repeatPayment := *payment
+	// newPayment := repeatPayment.ID
+
+	// paymentID := uuid.New().String()
+	newPayment := payment
+	s.payments = append(s.payments, newPayment)
+	// return payment, nil
+
+	return newPayment, nil
+}
