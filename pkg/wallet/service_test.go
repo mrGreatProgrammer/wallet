@@ -199,7 +199,7 @@ func TestService_Repeat_success(t *testing.T) {
 	}
 	
 	if !reflect.DeepEqual(payment, rep) {
-		t.Errorf("Repeat(): invalid data in repeated = %v, payment = %v ", rep, payment)
+		t.Errorf("Repeat(): invalid data in repeated, payment = %v ", payment)
 		return
 	}
 }
