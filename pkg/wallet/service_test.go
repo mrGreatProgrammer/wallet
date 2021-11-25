@@ -124,3 +124,47 @@ func TestService_FindPaymentByID_fail(t *testing.T) {
 	}
 }
 
+func TestService_Repeat_success(t *testing.T) {
+	// создаём сервис
+	s := newTestService()
+	_, payments, err := s.addAccount(defaultTestAccount)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	// пробуем повторить платёж
+	payment := payments[0]
+	rep, err := s.Repeat(payment.ID)
+	if err != nil {
+		t.Errorf("Repeat(): error = %v", err)
+		return
+	}
+	
+	if !reflect.DeepEqual(payment, rep) {
+		t.Errorf("invalid result, expected: %v, actual: %v, error", payment, rep)
+		return
+	}
+}
+
+func TestService_Repeat_fail(t *testing.T) {
+	// создаём сервис
+	s := newTestService()
+	_, _, err := s.addAccount(defaultTestAccount)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	// пробуем повторить несуществующий платёж
+	_, err = s.Repeat("hi")
+	if err == nil {
+		t.Errorf("Repeat(): must return error, returned nil = %v", err)
+		return
+	}
+	
+	if err != ErrPaymentNotFound {
+		t.Errorf("Repeat(): must return ErrPaymentNotFound, returned = %v", err)
+		return
+	}
+}
