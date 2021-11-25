@@ -198,7 +198,7 @@ func TestService_Repeat_success(t *testing.T) {
 		return
 	}
 	
-	if !reflect.DeepEqual(payment, rep) {
+	if !reflect.DeepEqual(payment.AccountID, rep.AccountID) {
 		t.Errorf("Repeat(): invalid data in repeated, payment = &amp;%v ", payment)
 		return
 	}

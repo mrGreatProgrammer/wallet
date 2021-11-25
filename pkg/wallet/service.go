@@ -147,7 +147,6 @@ func (s *Service) Repeat(paymentID string) (*types.Payment, error) {
 	}
 
 	pay, err := s.Pay(account.ID, payment.Amount, payment.Category)
-	pay.ID = paymentID
 	if err != nil {
 	 return nil, err
 	}
