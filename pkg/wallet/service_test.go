@@ -194,7 +194,7 @@ func TestService_Repeat_success(t *testing.T) {
 	payment := payments[0]
 	rep, err := s.Repeat(payment.ID)
 	if err != nil {
-		t.Errorf("invalid data in repeated, payment = %v", payment)
+		t.Errorf("Repeat(): invalid data in repeated, payment = %v", payment)
 		return
 	}
 	
