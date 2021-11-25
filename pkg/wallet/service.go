@@ -2,6 +2,7 @@ package wallet
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/google/uuid"
 	"github.com/mrGreatProgrammer/wallet/pkg/types"
@@ -17,6 +18,8 @@ var ErrPhoneRegistered = errors.New("phone already registered")
 var ErrAmountMustBePositive = errors.New("amount must be greater than zero")
 var ErrAccountNotFound = errors.New("account not found")
 var ErrNotEnoughBalance = errors.New("not enough balance")
+
+var ErrPaymentNotFound = errors.New("payment not found")
 
 type Service struct {
 	nextAcccountID int64
@@ -58,7 +61,6 @@ func (s *Service) Deposit(accountID int64, amount types.Money) error {
 		return ErrAccountNotFound
 	}
 
-	// зачисление средств пока не рассматриваем как платёж
 	account.Balance += amount
 	return nil
 }
@@ -106,4 +108,84 @@ func (s *Service) FindAccountByID(accountID int64) (*types.Account, error) {
 	}
 	
 	return nil, ErrAccountNotFound
+}
+
+func (s *Service) Reject(paymentID string) error {
+	payment, err := s.FindPaymentByID(paymentID)
+	if err != nil {
+		return err
+	}
+	account, err := s.FindAccountByID(payment.AccountID)
+	if err != nil {
+		return err
+	}
+
+	payment.Status = types.PaymentStatusFail
+	account.Balance += payment.Amount
+	return nil
+}
+
+func (s *Service) FindPaymentByID(paymentID string) (*types.Payment, error) {
+	for _, payment := range s.payments {
+		if payment.ID == paymentID {
+			return payment, nil
+		}
+	}
+
+	return nil, ErrPaymentNotFound
+}
+
+type testService struct {
+	*Service
+}
+
+func newTestService() *testService {
+	return &testService{Service: &Service{}}
+}
+
+type testAccount struct {
+	phone types.Phone
+	balance types.Money
+	payments []struct{
+		amount types.Money
+		category types.PaymentCategory
+	}
+}
+
+var defaultTestAccount = testAccount {
+	phone: "+992000000001",
+	balance: 10_000_00,
+	payments: []struct{
+		amount types.Money
+		category types.PaymentCategory
+	}{
+		{amount: 1_000_00, category: "auto"},
+	},
+}
+
+func (s *testService) addAccount(data testAccount) (*types.Account, []*types.Payment, error) {
+	// регисрируем там пользователя
+	account, err := s.RegisterAccount(data.phone)
+	if  err != nil {
+		return nil, nil, fmt.Errorf("cant register account, error = %v", err)
+	}
+
+	// пополняем счёт
+	err = s.Deposit(account.ID, data.balance)
+	if err != nil {
+		return nil, nil, fmt.Errorf("cant deposity account, error = %v", err)
+	}
+
+	// выполняем платежи
+	// можем создать слайс сразу нужной длины, поскольку знаем размер
+	payments := make([]*types.Payment, len(data.payments))
+	for i, payment := range data.payments {
+		// тогда здесь работаем просто через index, а не через append
+		payments[i], err = s.Pay(account.ID, payment.amount, payment.category)
+		if err != nil {
+			return nil, nil, fmt.Errorf("cant make, error = %v", err)
+		}
+	}
+
+	return account, payments, nil
 }
