@@ -226,7 +226,51 @@ func TestService_Repeat_fail(t *testing.T) {
 	}
 }
 
-func TestService_PayFromFavorite(t *testing.T) {
+func TestService_FavoriteFromPayment_success(t *testing.T) {
+	// создаём сервис
+	s := newTestService()
+	_, payments, err := s.addAccount(defaultTestAccount)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	payment := payments[0]
+
+	addFavorite, err := s.FavoritePayment(payment.ID, "megafon")
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	if err != nil {
+		t.Errorf("FavoritePaymetn(): invalid data %v, err = %v", addFavorite, err)
+		return
+	}
+	
+}
+
+func TestService_FavoriteFromPayment_fail(t *testing.T) {
+	s := newTestService()
+	_, _, err := s.addAccount(defaultTestAccount)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	_, err = s.FavoritePayment("hi", "g")
+	if err == nil {
+		t.Errorf("FavoritePayment(): must return error, returned nil = %v", err)
+		return
+	}
+
+	if err != ErrPaymentNotFound {
+		t.Errorf("FavoritePayment(): must return ErrPaymentNotFound, returned = %v", err)
+		return
+	}
+}
+
+func TestService_PayFromFavorite_success(t *testing.T) {
 	// создаём сервис
 	s := newTestService()
 	_, payments, err := s.addAccount(defaultTestAccount)
@@ -250,7 +294,27 @@ func TestService_PayFromFavorite(t *testing.T) {
 	}
 	
 	if err != nil {
-		t.Errorf("PayFromeFavorite(): invalid data in favorite = %v, payment = %v, hi = %v ", payFavorite, payment, err)
+		t.Errorf("PayFromeFavorite(): invalid data in favorite = %v, payment = %v, ", payFavorite, payment)
+		return
+	}
+}
+
+func TestService_PayFromFavorite_fail(t *testing.T) {
+	s := newTestService()
+	_, _, err := s.addAccount(defaultTestAccount)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	_, err = s.PayFromFavorite("hi")
+	if err == nil {
+		t.Errorf("PayFromFavorite(): must return error, returned nil = %v", err)
+		return
+	}
+
+	if err != ErrFavoriteNotFound {
+		t.Errorf("PayFromFavorite(): must return ErrFavoriteNotFound, returned = %v", err)
 		return
 	}
 }
