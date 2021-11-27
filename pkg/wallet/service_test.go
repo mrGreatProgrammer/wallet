@@ -225,3 +225,32 @@ func TestService_Repeat_fail(t *testing.T) {
 		return
 	}
 }
+
+func TestService_PayFromFavorite(t *testing.T) {
+	// создаём сервис
+	s := newTestService()
+	_, payments, err := s.addAccount(defaultTestAccount)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	payment := payments[0]
+
+	addFavorite, err := s.FavoritePayment(payment.ID, "megafon")
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	payFavorite, err := s.PayFromFavorite(addFavorite.ID)
+	if err != nil {
+		t.Errorf("PayFromFavorite(): invalid data in favorite, payment = %v", payFavorite)
+		return
+	}
+	
+	if err != nil {
+		t.Errorf("PayFromeFavorite(): invalid data in favorite = %v, payment = %v, hi = %v ", payFavorite, payment, err)
+		return
+	}
+}
