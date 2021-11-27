@@ -165,9 +165,9 @@ func (s *Service) FavoritePayment(paymentID string, name string) (*types.Favorit
 	if err != nil {
 		return nil, err
 	}
-
+	newPaymentID := uuid.New().String()
 	favorte := &types.Favorite{
-		ID:        paymentID,
+		ID:        newPaymentID,
 		AccountID: account.ID,
 		Name:      name,
 		Amount:    payment.Amount,
@@ -197,7 +197,6 @@ func (s *Service) PayFromFavorite(favoriteID string) (*types.Payment, error) {
 	}
 
 	payment, err := s.Pay(favorite.AccountID, favorite.Amount, favorite.Category)
-	payment.ID = favoriteID
 	if err != nil {
 		return nil, err
 	}
