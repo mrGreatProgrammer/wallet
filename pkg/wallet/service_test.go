@@ -287,12 +287,12 @@ func TestService_PayFromFavorite_success(t *testing.T) {
 
 	payFavorite, err := s.PayFromFavorite(addFavorite.ID)
 	if err != nil {
-		t.Errorf("PayFromFavorite(): invalid data in favorite, payment = %v", payFavorite)
+		t.Errorf("PayFromFavorite(): invalid data in favorite, payment = %v, err = %v", payFavorite, err)
 		return
 	}
 
 
-	if !reflect.DeepEqual(payment, payFavorite) {
+	if reflect.DeepEqual(payment, payFavorite) {
 		t.Errorf("PayFromFavorite(): invalid data in favorite = %v, payment = %v ", payFavorite, payment)
 		return
 	}
