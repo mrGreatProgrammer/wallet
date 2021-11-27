@@ -256,7 +256,7 @@ func TestService_FavoriteFromPayment_fail(t *testing.T) {
 		return
 	}
 
-	_, err = s.FavoritePayment("hi", "g")
+	_, err = s.FavoritePayment("no", "not")
 	if err == nil {
 		t.Errorf("FavoritePayment(): must return error, returned nil = %v", err)
 		return
