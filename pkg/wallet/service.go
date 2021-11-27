@@ -197,6 +197,7 @@ func (s *Service) PayFromFavorite(favoriteID string) (*types.Payment, error) {
 	}
 
 	payment, err := s.Pay(favorite.AccountID, favorite.Amount, favorite.Category)
+	payment.ID = favoriteID
 	if err != nil {
 		return nil, err
 	}
